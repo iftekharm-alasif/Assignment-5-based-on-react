@@ -1,5 +1,6 @@
 import { use, useState } from "react";
 import type { Technology } from "../type/technologies";
+import { toast } from "react-toastify";
 
 const technologiesPromise: Promise<Technology[]> = fetch(
   "/data/technologies.json",
@@ -11,28 +12,94 @@ export default function Technologies() {
   const [stack, setStack] = useState<Technology[]>([]);
 
   // Add Technology
-  const handleAddToStack = (technology: Technology) => {
-    const alreadyAdded = stack.some((item) => item.id === technology.id);
+ const handleAddToStack = (technology: Technology) => {
+  const alreadyAdded = stack.some(
+    (item) => item.id === technology.id
+  );
 
-    if (alreadyAdded) {
-      return;
-    }
+  if (alreadyAdded) {
+    toast.warning(
+      <div className="flex items-center gap-2">
+        <img
+          src={technology.icon}
+          alt={technology.name}
+          className="h-6 w-6"
+        />
 
-    setStack([...stack, technology]);
-  };
+        <span>
+          {technology.name} is already in your stack!
+        </span>
+      </div>
+    );
 
+    return;
+  }
+
+  setStack([...stack, technology]);
+
+  toast.success(
+    <div className="flex items-center gap-2">
+      <img
+        src={technology.icon}
+        alt={technology.name}
+        className="h-6 w-6"
+      />
+
+      <span>
+        {technology.name} added to your stack!
+      </span>
+    </div>
+  );
+};
   // Remove One Technology
-  const handleRemove = (id: string) => {
-    const newStack = stack.filter((technology) => technology.id !== id);
+ const handleRemove = (id: string) => {
+  const technology = stack.find(
+    (item) => item.id === id
+  );
 
-    setStack(newStack);
-  };
+  const newStack = stack.filter(
+    (item) => item.id !== id
+  );
+
+  setStack(newStack);
+
+  if (technology) {
+    toast.info(
+      <div className="flex items-center gap-2">
+        <img
+          src={technology.icon}
+          alt={technology.name}
+          className="h-6 w-6"
+        />
+
+        <span>
+          {technology.name} removed from your stack!
+        </span>
+      </div>
+    );
+  }
+};
 
   // Remove All Technologies
-  const handleRemoveAll = () => {
-    setStack([]);
-  };
+const handleRemoveAll = () => {
+  if (stack.length === 0) {
+    return;
+  }
 
+  const removedCount = stack.length;
+
+  setStack([]);
+
+  toast.info(
+    <div className="flex items-center gap-2">
+      <span className="text-lg">🗑️</span>
+
+      <span>
+        {removedCount} technologies removed from your stack!
+      </span>
+    </div>
+  );
+};
   return (
     <section className="mx-auto max-w-[1080px] px-5 py-16">
       {/* Section Heading */}
@@ -178,8 +245,9 @@ export default function Technologies() {
                       {/* Remove Button */}
                       <button
                         onClick={() => handleRemove(technology.id)}
-                        className="text-[9px] font-medium text-red-400 hover:text-red-600"
+                        className="flex items-center gap-1 rounded-md px-2 py-1 text-[9px] font-medium text-red-400 transition hover:bg-red-50 hover:text-red-600"
                       >
+                        <span>🗑</span>
                         Remove
                       </button>
                     </div>
