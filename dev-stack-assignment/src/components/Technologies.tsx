@@ -1,4 +1,4 @@
-import { use } from "react";
+import { use, useState } from "react";
 import type { Technology } from "../type/technologies";
 
 const technologiesPromise: Promise<Technology[]> = fetch(
@@ -8,8 +8,34 @@ const technologiesPromise: Promise<Technology[]> = fetch(
 export default function Technologies() {
   const technologies = use(technologiesPromise);
 
+  const [stack, setStack] = useState<Technology[]>([]);
+
+  // Add Technology
+  const handleAddToStack = (technology: Technology) => {
+    const alreadyAdded = stack.some((item) => item.id === technology.id);
+
+    if (alreadyAdded) {
+      return;
+    }
+
+    setStack([...stack, technology]);
+  };
+
+  // Remove One Technology
+  const handleRemove = (id: string) => {
+    const newStack = stack.filter((technology) => technology.id !== id);
+
+    setStack(newStack);
+  };
+
+  // Remove All Technologies
+  const handleRemoveAll = () => {
+    setStack([]);
+  };
+
   return (
     <section className="mx-auto max-w-[1080px] px-5 py-16">
+      {/* Section Heading */}
       <h2 className="text-3xl font-bold text-[#172033]">
         Explore the <span className="text-[#d83b9d]">Technologies</span>
       </h2>
@@ -18,60 +44,151 @@ export default function Technologies() {
         Pick one technology per category to build your ideal stack.
       </p>
 
-      {/* Technology Card */}
-      <div className="mt-8 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
-        {technologies.map((technology) => (
-          <div
-            key={technology.id}
-            className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm"
-          >
-            {/* Top */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <img
-                  src={technology.icon}
-                  alt={technology.name}
-                  className="h-10 w-10"
-                />
+      {/* Main Layout */}
+      <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_280px]">
+        {/* Technology Cards */}
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+          {technologies.map((technology) => (
+            <div
+              key={technology.id}
+              className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm"
+            >
+              {/* Top Part */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <img
+                    src={technology.icon}
+                    alt={technology.name}
+                    className="h-10 w-10"
+                  />
 
-                <div>
-                  <h3 className="text-sm font-bold text-[#172033]">
-                    {technology.name}
-                  </h3>
+                  <div>
+                    <h3 className="text-sm font-bold text-[#172033]">
+                      {technology.name}
+                    </h3>
 
-                  <span className="text-[10px] text-gray-400">
-                    {technology.category}
-                  </span>
+                    <span className="text-[10px] text-gray-400">
+                      {technology.category}
+                    </span>
+                  </div>
                 </div>
+
+                {/* Badge */}
+                <span className="rounded-full bg-orange-50 px-2 py-1 text-[9px] font-medium text-orange-500">
+                  {technology.badge}
+                </span>
               </div>
 
-              <span className="rounded-full bg-orange-50 px-2 py-1 text-[9px] font-medium text-orange-500">
-                {technology.badge}
+              {/* Description */}
+              <p className="mt-4 text-xs leading-5 text-gray-500">
+                {technology.description}
+              </p>
+
+              {/* Difficulty + Rating */}
+              <div className="mt-4 flex items-center justify-between">
+                <span className="rounded-full bg-gray-100 px-2 py-1 text-[9px] text-gray-500">
+                  {technology.difficulty}
+                </span>
+
+                <span className="text-xs text-yellow-500">
+                  ★ {technology.rating}
+                </span>
+              </div>
+
+              {/* Add Button */}
+              <button
+                onClick={() => handleAddToStack(technology)}
+                className="mt-4 w-full rounded-md bg-[#080d1c] py-2 text-[11px] font-medium text-white"
+              >
+                Add to Stack
+              </button>
+            </div>
+          ))}
+        </div>
+
+        {/* Your Stack Sidebar */}
+        <div>
+          <div className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
+            {/* Stack Heading */}
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-bold text-[#172033]">Your Stack</h3>
+
+              <span className="rounded-full bg-pink-50 px-2 py-1 text-[10px] font-medium text-[#d83b9d]">
+                {stack.length}
               </span>
             </div>
 
-            {/* Description */}
-            <p className="mt-4 text-xs leading-5 text-gray-500">
-              {technology.description}
-            </p>
+            {/* Remove All Button */}
+            {stack.length > 0 && (
+              <button
+                onClick={handleRemoveAll}
+                className="mt-4 text-[10px] font-medium text-red-400 hover:text-red-600"
+              >
+                Remove All
+              </button>
+            )}
 
-            {/* Difficulty + Rating */}
-            <div className="mt-4 flex items-center justify-between">
-              <span className="rounded-full bg-gray-100 px-2 py-1 text-[9px] text-gray-500">
-                {technology.difficulty}
-              </span>
+            {/* Stack Content */}
+            <div className="mt-6">
+              {stack.length === 0 ? (
+                /* Empty State */
+                <div className="text-center">
+                  <p className="text-xs text-gray-400">Your stack is empty</p>
 
-              <span className="text-xs text-yellow-500">
-                ★ {technology.rating}
-              </span>
+                  <p className="mt-1 text-[10px] text-gray-300">
+                    Add technologies to build your stack.
+                  </p>
+                </div>
+              ) : (
+                /* Selected Technologies */
+                <div className="space-y-3">
+                  {stack.map((technology) => (
+                    <div
+                      key={technology.id}
+                      className="flex items-center justify-between rounded-lg bg-gray-50 p-3"
+                    >
+                      {/* Technology Info */}
+                      <div className="flex items-center gap-3">
+                        <img
+                          src={technology.icon}
+                          alt={technology.name}
+                          className="h-7 w-7"
+                        />
+
+                        <div>
+                          <h4 className="text-xs font-semibold text-[#172033]">
+                            {technology.name}
+                          </h4>
+
+                          <p className="text-[9px] text-gray-400">
+                            {technology.category}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Remove Button */}
+                      <button
+                        onClick={() => handleRemove(technology.id)}
+                        className="text-[9px] text-red-400 hover:text-red-600"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+                  {/* Remove All */}
+                  <div className="flex justify-center pt-2">
+                    <button
+                      onClick={handleRemoveAll}
+                      className="rounded-md border border-red-100 bg-red-50 px-4 py-2 text-[10px] font-bold text-red-500 transition hover:bg-red-100"
+                    >
+                      Remove All
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
-
-            {/* Button */}
-            <button className="mt-4 w-full rounded-md bg-[#080d1c] py-2 text-[11px] font-medium text-white">
-              Add to Stack
-            </button>
           </div>
-        ))}
+        </div>
       </div>
     </section>
   );
