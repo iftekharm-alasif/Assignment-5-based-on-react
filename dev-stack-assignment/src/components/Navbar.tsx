@@ -1,4 +1,4 @@
-import NavBrandLogo from "./logo-text.png"
+import BrandLogo from "./logo-text.png"
 export default function Navbar() {
   return (
     <nav className="sticky top-0 z-50 border-b border-gray-100 bg-white">
@@ -6,7 +6,7 @@ export default function Navbar() {
 
         {/* Logo */}
       <div>
-        <img src={NavBrandLogo} alt="" />
+        <img src={BrandLogo} alt="" />
       </div>
 
         {/* Navigation Links */}

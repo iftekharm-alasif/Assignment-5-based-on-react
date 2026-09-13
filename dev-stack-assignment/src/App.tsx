@@ -4,6 +4,7 @@ import Hero from './components/Hero'
 import Technologies from './components/Technologies'
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Footer from "./components/Footer";
 import './App.css'
 
 function App() {
@@ -15,8 +16,9 @@ function App() {
         <Technologies />
       </Suspense>
       <ToastContainer></ToastContainer>
+      <Footer></Footer>
 
-      {/* <Technologies></Technologies> */}
+  
 
     </>
   )
